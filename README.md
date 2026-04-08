@@ -93,7 +93,7 @@ TRANSPORT=http PORT=3000 MCP_HTTP_BEARER_TOKEN=secret pnpm start
 
 ## Authentication tools
 
-- **`fortimail_engine_status`** — liveness (`/health`); optional detailed readiness (`/health/detailed`, Bearer).
+- **`fortimail_engine_status`** — liveness (`GET /health`); optional detailed readiness (`GET /health/detailed`, Bearer). Both are requested at the **engine origin** (same host/port as `FORTIMAIL_ENGINE_URL` with `/v1` stripped), not under `/v1`.
 - **`fortimail_logout`** — no-op (legacy name; engine uses API keys only).
 - **`fortimail_flush_cache`** — clears MCP response cache (not the engine server cache).
 

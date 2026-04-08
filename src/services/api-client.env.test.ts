@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+describe("engineRootOriginUrl", () => {
+  it("strips trailing /v1 for health routes", async () => {
+    const { engineRootOriginUrl } = await import("./api-client.js");
+    expect(engineRootOriginUrl("https://engine.example.com/v1")).toBe(
+      "https://engine.example.com",
+    );
+    expect(engineRootOriginUrl("http://localhost:3000/v1")).toBe("http://localhost:3000");
+  });
+});
+
 describe("getClient", () => {
   beforeEach(() => {
     vi.resetModules();

@@ -43,16 +43,31 @@ export function normalizeEngineBaseUrl(url: string): string {
   return url.trim().replace(/\/+$/, "");
 }
 
+/**
+ * Health endpoints (`/health`, `/health/detailed`) are mounted at the engine HTTP
+ * root, not under `/v1`. `FORTIMAIL_ENGINE_URL` stays `https://host/v1` for API routes.
+ */
+export function engineRootOriginUrl(v1BaseUrl: string): string {
+  const b = normalizeEngineBaseUrl(v1BaseUrl);
+  const stripped = b.replace(/\/v1$/i, "");
+  return stripped.length > 0 ? stripped : b;
+}
+
 // ─── Client ──────────────────────────────────────────────────────────────────
 
 export class EngineClient {
   private ax: AxiosInstance;
   readonly baseUrl: string;
+  /** Origin for `/health` and `/health/detailed` (no `/v1` prefix). */
+  private readonly rootOriginUrl: string;
+  private readonly apiKey: string;
   private readonly verifyCert: boolean;
   private cache: CacheBackend;
 
   constructor(cfg: EngineClientConfig) {
     this.baseUrl = normalizeEngineBaseUrl(cfg.baseUrl);
+    this.rootOriginUrl = engineRootOriginUrl(this.baseUrl);
+    this.apiKey = cfg.apiKey;
     this.verifyCert = cfg.verifyCert ?? true;
     this.cache = getCache();
 
@@ -62,7 +77,7 @@ export class EngineClient {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${cfg.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
       },
       httpsAgent: new https.Agent({
         rejectUnauthorized: this.verifyCert,
@@ -70,10 +85,10 @@ export class EngineClient {
     });
   }
 
-  /** GET /health — no Bearer (OpenAPI: security []). */
+  /** GET /health — no Bearer (OpenAPI: security []). Served at engine root, not under `/v1`. */
   async getLiveness(): Promise<unknown> {
     const ax = axios.create({
-      baseURL: this.baseUrl,
+      baseURL: this.rootOriginUrl,
       timeout: REQUEST_TIMEOUT_MS,
       headers: { Accept: "application/json" },
       httpsAgent: new https.Agent({
@@ -84,9 +99,20 @@ export class EngineClient {
     return res.data;
   }
 
-  /** GET /health/detailed — requires Bearer. */
+  /** GET /health/detailed — requires Bearer. Served at engine root, not under `/v1`. */
   async getReadiness(): Promise<unknown> {
-    const res = await this.ax.get("/health/detailed");
+    const ax = axios.create({
+      baseURL: this.rootOriginUrl,
+      timeout: REQUEST_TIMEOUT_MS,
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: this.verifyCert,
+      }),
+    });
+    const res = await ax.get("/health/detailed");
     return res.data;
   }
 
