@@ -1,0 +1,41 @@
+# Git / VCS
+.git
+.gitignore
+**/.git
+
+# Dependencies & build output (rebuilt in image)
+node_modules
+dist
+
+# Dev & test
+coverage
+**/*.test.ts
+**/__tests__
+vitest.config.*
+.vscode
+.idea
+
+# Env & secrets (never copy into build context)
+.env
+.env.*
+!.env.example
+docker/*.env
+docker/secrets
+
+# Docs & misc (smaller context, fewer accidental leaks)
+*.md
+!README.md
+LICENSE
+CONTRIBUTING.md
+SECURITY.md
+docs
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# CI
+.github

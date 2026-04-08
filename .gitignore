@@ -2,6 +2,7 @@ node_modules/
 dist/
 .env
 .env.local
+docker/.env
 *.log
 .specstory/
 .DS_Store

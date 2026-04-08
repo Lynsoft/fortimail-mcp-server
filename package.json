@@ -12,7 +12,8 @@
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "docker:build": "docker build -t fortimail-mcp-server:production --target production ."
   },
   "engines": {
     "node": ">=18"

@@ -1,0 +1,81 @@
+# Production-oriented stack for FortiMail MCP (Docker Compose v2+)
+#
+# Usage:
+#   cp docker/env.example docker/.env
+#   # Edit docker/.env — set secrets and MCP_HTTP_BEARER_TOKEN
+#   docker compose --env-file docker/.env up -d --build
+#
+# MCP endpoint (after TLS on your reverse proxy): https://<host>/mcp
+# Health: GET http://<container>:3000/health
+
+services:
+  fortimail-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: fortimail-mcp-server:production
+    restart: unless-stopped
+
+    # Docker Compose 2.24+: optional file. Otherwise: cp docker/env.example docker/.env
+    env_file:
+      - path: docker/.env
+        required: false
+
+    environment:
+      TRANSPORT: http
+      PORT: "3000"
+      MCP_HTTP_HOST: 0.0.0.0
+      # Override in docker/.env:
+      # FORTIMAIL_ENGINE_URL
+      # FORTIMAIL_ENGINE_API_KEY
+      # MCP_HTTP_BEARER_TOKEN (required for remote / untrusted networks)
+      # FORTIMAIL_CACHE_BACKEND=redis + REDIS_URL when using cache service below
+
+    ports:
+      - "127.0.0.1:3000:3000"
+
+    # --- Enterprise container hardening ---
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+
+    # Optional: attach to same network as FortiMail Engine / private endpoints
+    # networks:
+    #   - fortimail-backend
+
+  # Uncomment for shared MCP response cache across replicas (set FORTIMAIL_CACHE_BACKEND=redis, REDIS_URL)
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+  #   command: ["redis-server", "--appendonly", "no", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - fortimail-backend
+  #   # Require password in production:
+  #   # command: ["redis-server", "--requirepass", "$(REDIS_PASSWORD)"]
+
+# networks:
+#   fortimail-backend:
+#     driver: bridge
+
+# volumes:
+#   redis-data:
