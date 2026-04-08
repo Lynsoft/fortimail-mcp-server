@@ -1,0 +1,42 @@
+<evaluation>
+  <qa_pair>
+    <question>List all configured mail domains on the FortiMail appliance and report how many there are.</question>
+    <answer>Use fortimail_list_domains to retrieve the full domain list with count.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>What DKIM signing option is configured for the domain "example.com"?</question>
+    <answer>Use fortimail_get_domain with domain="example.com" and check the dkim_signing_option field in the returned JSON.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Find all emails stuck in the deferred queue (sdefault) that were sent from "fortinet.com" and show their subjects.</question>
+    <answer>Use fortimail_search_mail_queue with queue_type="sdefault", sender="fortinet.com" to list matching items with subjects.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>How many mail users exist under the domain "corp.local" and what are their display names?</question>
+    <answer>Use fortimail_list_mail_users with domain="corp.local" to get the user list with count and displayname fields.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>View the full body content of the queued email with mkey "243LACoE014942-243LACoF014942" in the deferred queue.</question>
+    <answer>Use fortimail_view_queued_mail with mail_key="243LACoE014942-243LACoF014942", account_type="deferred_queue", open_method=3.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>List all admin log files (alog type) and identify the most recent one along with its size.</question>
+    <answer>Use fortimail_list_log_files with log_type="alog" to get the file list; the first entry (mkey="alog") is the current/most recent.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>What GeoIP profiles are currently configured, and which countries do they cover?</question>
+    <answer>Use fortimail_list_geoip_profiles to retrieve all ProfGeoip entries with their mkey and country fields.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Generate a new domain mail statistics report and then list the available reports to confirm it was created.</question>
+    <answer>First call fortimail_generate_domain_mail_stats_report, then call fortimail_list_reports with report_class="domain_mailstats" to see the new entry.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Check whether the SMTP proxy is configured to preserve original client IPs (proxy_original setting).</question>
+    <answer>Use fortimail_get_smtp_config and check the proxy_original boolean field in the response.</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>List all IMAP authentication profiles for domain "secure.org" and show their server addresses and ports.</question>
+    <answer>Use fortimail_list_imap_auth_profiles with domain="secure.org" to get all ProfAuthImap entries with server and port fields.</answer>
+  </qa_pair>
+</evaluation>

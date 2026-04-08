@@ -1,0 +1,37 @@
+{
+  "name": "fortimail-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for FortiMail 7.6.2 REST API — full endpoint coverage with caching, security, and reliability",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "codegen": "openapi-typescript openapi/openapi.json -o src/generated/engine-schema.ts",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "axios": "^1.7.9",
+    "dotenv": "^17.4.1",
+    "express": "^4.21.0",
+    "ioredis": "^5.4.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.0",
+    "openapi-typescript": "7.4.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.3"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
