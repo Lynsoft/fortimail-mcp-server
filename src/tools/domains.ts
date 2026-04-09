@@ -16,7 +16,7 @@ function truncate(text: string): string {
 
 export function registerDomainTools(server: McpServer): void {
   server.registerTool(
-    "fortimail_list_domains",
+    "fortimail.domains.list",
     {
       title: "List Domains",
       description:
@@ -59,7 +59,7 @@ export function registerDomainTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_get_domain",
+    "fortimail.domains.get",
     {
       title: "Get Domain Settings",
       description:
@@ -98,7 +98,7 @@ export function registerDomainTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_create_domain",
+    "fortimail.domains.create",
     {
       title: "Create Domain",
       description:
@@ -146,7 +146,7 @@ export function registerDomainTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_update_domain",
+    "fortimail.domains.update",
     {
       title: "Update Domain Settings",
       description:
@@ -188,7 +188,7 @@ export function registerDomainTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_delete_domain",
+    "fortimail.domains.delete",
     {
       title: "Delete Domain",
       description:
@@ -223,7 +223,7 @@ export function registerDomainTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_get_domain_info",
+    "fortimail.domains.info.get",
     {
       title: "Get Domain Info",
       description:
@@ -262,7 +262,7 @@ export function registerDomainTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_update_domain_info",
+    "fortimail.domains.info.update",
     {
       title: "Update Domain Info",
       description:

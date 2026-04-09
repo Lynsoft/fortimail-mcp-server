@@ -27,7 +27,7 @@ function registerProfileCrud(server: McpServer, spec: ProfileSpec): void {
     : {};
 
   server.registerTool(
-    `fortimail_list_${spec.prefix}s`,
+    `fortimail.profiles.${spec.prefix}.list`,
     {
       title: `List ${spec.label}s`,
       description:
@@ -66,7 +66,7 @@ function registerProfileCrud(server: McpServer, spec: ProfileSpec): void {
   );
 
   server.registerTool(
-    `fortimail_get_${spec.prefix}`,
+    `fortimail.profiles.${spec.prefix}.get`,
     {
       title: `Get ${spec.label}`,
       description: `**Purpose:** Get one ${spec.label}.`,
@@ -100,7 +100,7 @@ function registerProfileCrud(server: McpServer, spec: ProfileSpec): void {
   );
 
   server.registerTool(
-    `fortimail_create_${spec.prefix}`,
+    `fortimail.profiles.${spec.prefix}.create`,
     {
       title: `Create ${spec.label}`,
       description: `**Purpose:** Create ${spec.label} (see engine OpenAPI for required body fields).`,
@@ -142,7 +142,7 @@ function registerProfileCrud(server: McpServer, spec: ProfileSpec): void {
   );
 
   server.registerTool(
-    `fortimail_update_${spec.prefix}`,
+    `fortimail.profiles.${spec.prefix}.update`,
     {
       title: `Update ${spec.label}`,
       description: `**Purpose:** Update ${spec.label}.`,
@@ -181,7 +181,7 @@ function registerProfileCrud(server: McpServer, spec: ProfileSpec): void {
   );
 
   server.registerTool(
-    `fortimail_delete_${spec.prefix}`,
+    `fortimail.profiles.${spec.prefix}.delete`,
     {
       title: `Delete ${spec.label}`,
       description: `**Purpose:** Delete ${spec.label}.`,
@@ -214,7 +214,7 @@ function registerProfileCrud(server: McpServer, spec: ProfileSpec): void {
 
 export function registerProfileTools(server: McpServer): void {
   registerProfileCrud(server, {
-    prefix: "geoip_profile",
+    prefix: "geoip",
     label: "GeoIP Profile",
     domainScoped: false,
     listPath: () => "/geo-profiles",
@@ -222,7 +222,7 @@ export function registerProfileTools(server: McpServer): void {
   });
 
   registerProfileCrud(server, {
-    prefix: "notification_profile",
+    prefix: "notification",
     label: "Notification Profile",
     domainScoped: true,
     listPath: (d) => `/domains/${encodeURIComponent(d!)}/notifications`,
@@ -231,7 +231,7 @@ export function registerProfileTools(server: McpServer): void {
   });
 
   registerProfileCrud(server, {
-    prefix: "imap_auth_profile",
+    prefix: "imap_auth",
     label: "IMAP Auth Profile",
     domainScoped: true,
     listPath: (d) => `/domains/${encodeURIComponent(d!)}/auth/imap`,
@@ -240,7 +240,7 @@ export function registerProfileTools(server: McpServer): void {
   });
 
   registerProfileCrud(server, {
-    prefix: "smtp_auth_profile",
+    prefix: "smtp_auth",
     label: "SMTP Auth Profile",
     domainScoped: true,
     listPath: (d) => `/domains/${encodeURIComponent(d!)}/auth/smtp`,

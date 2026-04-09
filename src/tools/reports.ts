@@ -16,7 +16,7 @@ const reportClassEnum = z
 
 export function registerReportTools(server: McpServer): void {
   server.registerTool(
-    "fortimail_list_reports",
+    "fortimail.reports.list",
     {
       title: "List Reports",
       description: "**Purpose:** `GET /v1/reports`.",
@@ -70,7 +70,7 @@ export function registerReportTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_download_report",
+    "fortimail.reports.download",
     {
       title: "Download Report",
       description: "**Purpose:** `POST /v1/reports/download` (binary payload decoded as UTF-8 text when possible).",
@@ -107,7 +107,7 @@ export function registerReportTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_delete_reports",
+    "fortimail.reports.delete",
     {
       title: "Delete Reports",
       description: "**Purpose:** `DELETE /v1/reports` with query params.",
@@ -139,7 +139,7 @@ export function registerReportTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_generate_mail_stats_report",
+    "fortimail.reports.generate.mail_stats",
     {
       title: "Generate Mail Statistics Report",
       description: "**Purpose:** `POST /v1/reports/mail-stats`.",
@@ -172,7 +172,7 @@ export function registerReportTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_generate_domain_mail_stats_report",
+    "fortimail.reports.generate.domain_mail_stats",
     {
       title: "Generate Domain Mail Statistics Report",
       description: "**Purpose:** `POST /v1/reports/domain-stats`.",
@@ -203,7 +203,7 @@ export function registerReportTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_generate_mailbox_stats_report",
+    "fortimail.reports.generate.mailbox_stats",
     {
       title: "Generate Mailbox Statistics Report",
       description: "**Purpose:** `POST /v1/reports/mailbox`.",

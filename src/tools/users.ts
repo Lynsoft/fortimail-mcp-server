@@ -15,7 +15,7 @@ function truncate(text: string): string {
 
 export function registerUserTools(server: McpServer): void {
   server.registerTool(
-    "fortimail_list_mail_users",
+    "fortimail.users.list",
     {
       title: "List Mail Users",
       description:
@@ -59,7 +59,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_get_mail_user",
+    "fortimail.users.get",
     {
       title: "Get Mail User",
       description:
@@ -93,7 +93,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_create_mail_user",
+    "fortimail.users.create",
     {
       title: "Create Mail User",
       description:
@@ -135,7 +135,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_update_mail_user",
+    "fortimail.users.update",
     {
       title: "Update Mail User",
       description:
@@ -176,7 +176,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_delete_mail_user",
+    "fortimail.users.delete",
     {
       title: "Delete Mail User",
       description: "**Purpose:** `DELETE /v1/domains/{domain}/users/{key}`.\n**Side effects:** Flushes MCP cache.",
@@ -204,7 +204,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_list_user_maps",
+    "fortimail.users.maps.list",
     {
       title: "List User Maps",
       description: "**Purpose:** `GET /v1/user-maps`.\n**Side effects:** None (read-only).",
@@ -235,7 +235,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_get_user_map",
+    "fortimail.users.maps.get",
     {
       title: "Get User Map",
       description:
@@ -276,7 +276,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_create_user_map",
+    "fortimail.users.maps.create",
     {
       title: "Create User Map",
       description:
@@ -317,7 +317,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_update_user_map",
+    "fortimail.users.maps.update",
     {
       title: "Update User Map",
       description: "**Purpose:** `PUT /v1/user-maps/{key}`.\n**Side effects:** Flushes MCP cache.",
@@ -352,7 +352,7 @@ export function registerUserTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_delete_user_map",
+    "fortimail.users.maps.delete",
     {
       title: "Delete User Map",
       description: "**Purpose:** `DELETE /v1/user-maps/{key}`.\n**Side effects:** Flushes MCP cache.",

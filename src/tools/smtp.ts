@@ -9,7 +9,7 @@ import { getClient, handleApiError } from "../services/api-client.js";
 
 export function registerSmtpTools(server: McpServer): void {
   server.registerTool(
-    "fortimail_get_smtp_config",
+    "fortimail.smtp.config.get",
     {
       title: "Get SMTP Configuration",
       description: "**Purpose:** `GET /v1/smtp-config`.",
@@ -38,7 +38,7 @@ export function registerSmtpTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_update_smtp_config",
+    "fortimail.smtp.config.update",
     {
       title: "Update SMTP Configuration",
       description: "**Purpose:** `PUT /v1/smtp-config`.",

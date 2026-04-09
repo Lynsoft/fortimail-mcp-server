@@ -8,7 +8,7 @@ import { getClient, handleApiError } from "../services/api-client.js";
 
 export function registerAuthTools(server: McpServer): void {
   server.registerTool(
-    "fortimail_engine_status",
+    "fortimail.engine.status",
     {
       title: "FortiMail Engine Status",
       description:
@@ -58,7 +58,7 @@ export function registerAuthTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_logout",
+    "fortimail.auth.logout",
     {
       title: "FortiMail Logout (no-op)",
       description:
@@ -86,7 +86,7 @@ export function registerAuthTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_flush_cache",
+    "fortimail.cache.flush",
     {
       title: "Flush MCP Response Cache",
       description:

@@ -11,7 +11,7 @@ import { truncateForModel } from "../text-utils.js";
 
 export function registerLogTools(server: McpServer): void {
   server.registerTool(
-    "fortimail_list_log_files",
+    "fortimail.logs.list",
     {
       title: "List Log Files",
       description: "**Purpose:** `GET /v1/logs?type=&limit=&offset=`.",
@@ -59,7 +59,7 @@ export function registerLogTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_download_log",
+    "fortimail.logs.download",
     {
       title: "Download Log File",
       description:

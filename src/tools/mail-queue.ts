@@ -49,7 +49,7 @@ function formatQueueItem(item: MailQueueItem | Record<string, unknown>): string 
 
 export function registerMailQueueTools(server: McpServer): void {
   server.registerTool(
-    "fortimail_list_mail_queue",
+    "fortimail.queue.list",
     {
       title: "List Mail Queue",
       description:
@@ -93,7 +93,7 @@ export function registerMailQueueTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_search_mail_queue",
+    "fortimail.queue.search",
     {
       title: "Search Mail Queue",
       description:
@@ -159,7 +159,7 @@ export function registerMailQueueTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_view_queued_mail",
+    "fortimail.queue.view",
     {
       title: "View Queued Mail",
       description: "**Purpose:** `GET /v1/queue/view`.",
@@ -226,7 +226,7 @@ export function registerMailQueueTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_delete_queued_mail",
+    "fortimail.queue.delete",
     {
       title: "Delete Queued Mail",
       description:
@@ -265,7 +265,7 @@ export function registerMailQueueTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_send_to_alternate_host",
+    "fortimail.queue.reroute",
     {
       title: "Send Queued Mail to Alternate Host",
       description: "**Purpose:** `POST /v1/queue/reroute`.",
@@ -308,7 +308,7 @@ export function registerMailQueueTools(server: McpServer): void {
   );
 
   server.registerTool(
-    "fortimail_download_queued_mail",
+    "fortimail.queue.download",
     {
       title: "Download Queued Mail",
       description:

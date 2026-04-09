@@ -20,7 +20,7 @@
 
 | Layer | Role |
 |-------|------|
-| **This repo** | Auditable MCP “driver”: maps tools → Engine REST paths, adds caching and truncation |
+| **This repo** | Auditable MCP "driver": maps tools → Engine REST paths, adds caching and truncation |
 | **FortiMail Engine** (proprietary) | Policy, FortiMail quirks, rate limits, optional multi-tenant routing |
 | **FortiMail appliance** | Reached only by the engine, not by this MCP process |
 
@@ -30,11 +30,11 @@ Upstream contract: vendored [`openapi/openapi.json`](openapi/openapi.json). When
 
 | Workflow | Example prompt | Tools involved |
 |----------|----------------|----------------|
-| **Engine health** | “Check FortiMail Engine status with detailed readiness” | `fortimail_engine_status` |
-| **Queue triage** | “List the incoming queue, then show full headers for mkey …” | `fortimail_list_mail_queue`, `fortimail_view_queued_mail` |
-| **Redirect stuck mail** | “Search the deferred queue for recipient X, reroute to backup.example.com” | `fortimail_search_mail_queue`, `fortimail_send_to_alternate_host` |
-| **Log investigation** | “List elog files, download the segment …” | `fortimail_list_log_files`, `fortimail_download_log` |
-| **Reporting** | “List reports, trigger mail stats for task Daily_Stats” | `fortimail_list_reports`, `fortimail_generate_mail_stats_report` |
+| **Engine health** | "Check FortiMail Engine status with detailed readiness" | `fortimail.engine.status` |
+| **Queue triage** | "List the incoming queue, then show full headers for mkey …" | `fortimail.queue.list`, `fortimail.queue.view` |
+| **Redirect stuck mail** | "Search the deferred queue for recipient X, reroute to backup.example.com" | `fortimail.queue.search`, `fortimail.queue.reroute` |
+| **Log investigation** | "List elog files, download the segment …" | `fortimail.logs.list`, `fortimail.logs.download` |
+| **Reporting** | "List reports, trigger mail stats for task Daily_Stats" | `fortimail.reports.list`, `fortimail.reports.generate.mail_stats` |
 
 ## Security model
 
@@ -93,9 +93,9 @@ TRANSPORT=http PORT=3000 MCP_HTTP_BEARER_TOKEN=secret pnpm start
 
 ## Authentication tools
 
-- **`fortimail_engine_status`** — liveness (`GET /health`); optional detailed readiness (`GET /health/detailed`, Bearer). Both are requested at the **engine origin** (same host/port as `FORTIMAIL_ENGINE_URL` with `/v1` stripped), not under `/v1`.
-- **`fortimail_logout`** — no-op (legacy name; engine uses API keys only).
-- **`fortimail_flush_cache`** — clears MCP response cache (not the engine server cache).
+- **`fortimail.engine.status`** — liveness (`GET /health`); optional detailed readiness (`GET /health/detailed`, Bearer). Both are requested at the **engine origin** (same host/port as `FORTIMAIL_ENGINE_URL` with `/v1` stripped), not under `/v1`.
+- **`fortimail.auth.logout`** — no-op (legacy name; engine uses API keys only).
+- **`fortimail.cache.flush`** — clears MCP response cache (not the engine server cache).
 
 ## Publishing to MCP directories
 
@@ -117,25 +117,25 @@ Contributions: [CONTRIBUTING.md](CONTRIBUTING.md). Security: [SECURITY.md](SECUR
 
 ## Tool inventory
 
-### Authentication (3 tools)
-- `fortimail_engine_status` / `fortimail_logout` / `fortimail_flush_cache`
+### Engine & cache (3 tools)
+- `fortimail.engine.status` / `fortimail.auth.logout` / `fortimail.cache.flush`
 
 ### Domains (7 tools)
-- `fortimail_list_domains` / `fortimail_get_domain` / `fortimail_create_domain` / `fortimail_update_domain` / `fortimail_delete_domain`
-- `fortimail_get_domain_info` / `fortimail_update_domain_info`
+- `fortimail.domains.list` / `fortimail.domains.get` / `fortimail.domains.create` / `fortimail.domains.update` / `fortimail.domains.delete`
+- `fortimail.domains.info.get` / `fortimail.domains.info.update`
 
 ### Users (10 tools)
-- Mail users: list / get / create / update / delete
-- User maps: list / get / create / update / delete
+- Mail users: `fortimail.users.list` / `.get` / `.create` / `.update` / `.delete`
+- User maps: `fortimail.users.maps.list` / `.get` / `.create` / `.update` / `.delete`
 
 ### Profiles (20 tools)
-- GeoIP, Notification, IMAP auth, SMTP auth — CRUD each
+- GeoIP, Notification, IMAP auth, SMTP auth — CRUD each (e.g. `fortimail.profiles.geoip.list`)
 
 ### Mail queue (6 tools)
-- `fortimail_download_queued_mail` returns a **not available** message until the engine exposes an equivalent route
+- `fortimail.queue.list` / `.search` / `.view` / `.delete` / `.reroute` / `.download`
 
 ### Reports (6), Logs (2), SMTP (2)
-- As in previous releases, mapped to `/v1/reports`, `/v1/logs`, `/v1/smtp-config`
+- `fortimail.reports.*`, `fortimail.logs.*`, `fortimail.smtp.config.*`
 
 ## Repository layout
 
