@@ -21,7 +21,8 @@ import { z } from "zod";
  * Exported so `smithery` CLI can extract it automatically.
  */
 export const configSchema = z.object({
-  bearerToken: z
+  /** Same value as host `MCP_HTTP_BEARER_TOKEN` (Smithery UI field name). */
+  mcp_bearer_token: z
     .string()
     .optional()
     .describe("Bearer token for authenticating to the FortiMail MCP server"),

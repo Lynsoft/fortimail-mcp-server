@@ -122,7 +122,7 @@ This server matches Smithery’s **URL** publishing expectations:
 Point the client at `https://your-host/mcp` and configure the **same** secret the server expects:
 
 - **Authorization:** `Bearer <MCP_HTTP_BEARER_TOKEN>`, or  
-- **Header:** `X-MCP-Bearer-Token: <MCP_HTTP_BEARER_TOKEN>` (matches Smithery `bearerToken` / `x-mcp-bearer-token`), or  
+- **Header:** `X-MCP-Bearer-Token: <MCP_HTTP_BEARER_TOKEN>` (matches Smithery `mcp_bearer_token` / `x-mcp-bearer-token`), or  
 - **Query:** `?mcp_bearer_token=<token>` (less ideal; may appear in logs)
 
 ## MSP and multi-instance

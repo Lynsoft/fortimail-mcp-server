@@ -1,10 +1,10 @@
 {
   "type": "object",
   "properties": {
-    "bearerToken": {
+    "mcp_bearer_token": {
       "type": "string",
       "title": "MCP Bearer Token",
-      "description": "Bearer token for authenticating to the FortiMail MCP server (matches MCP_HTTP_BEARER_TOKEN on host).",
+      "description": "Must exactly match MCP_HTTP_BEARER_TOKEN on the server (no extra spaces; paste once).",
       "x-from": {
         "header": "x-mcp-bearer-token"
       },

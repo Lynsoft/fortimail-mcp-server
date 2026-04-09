@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { isMcpHttpAuthorized } from "./http-auth.js";
+import {
+  bearerCredentialFromAuthorization,
+  isMcpHttpAuthorized,
+} from "./http-auth.js";
 
 describe("isMcpHttpAuthorized", () => {
   const snapshot: Record<string, string | undefined> = {};
@@ -29,6 +32,20 @@ describe("isMcpHttpAuthorized", () => {
       isMcpHttpAuthorized({ authorization: "Bearer secret" }),
     ).toBe(true);
     expect(isMcpHttpAuthorized({})).toBe(false);
+  });
+
+  it("accepts Bearer with extra spaces or lowercase scheme (gateways)", () => {
+    process.env.MCP_HTTP_BEARER_TOKEN = "secret";
+    delete process.env.MCP_HTTP_API_KEY;
+    expect(isMcpHttpAuthorized({ authorization: "Bearer  secret" })).toBe(true);
+    expect(isMcpHttpAuthorized({ authorization: "bearer secret" })).toBe(true);
+    expect(bearerCredentialFromAuthorization("Bearer secret")).toBe("secret");
+  });
+
+  it("strips surrounding quotes from env token (Docker .env mistakes)", () => {
+    process.env.MCP_HTTP_BEARER_TOKEN = '"secret"';
+    delete process.env.MCP_HTTP_API_KEY;
+    expect(isMcpHttpAuthorized({ authorization: "Bearer secret" })).toBe(true);
   });
 
   it("accepts mcp_bearer_token query param when Bearer env is set (gateway / Smithery)", () => {
