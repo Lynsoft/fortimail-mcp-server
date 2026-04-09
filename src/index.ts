@@ -23,6 +23,7 @@ import { z } from "zod";
 export const configSchema = z.object({
   bearerToken: z
     .string()
+    .optional()
     .describe("Bearer token for authenticating to the FortiMail MCP server"),
   verifyCert: z
     .boolean()

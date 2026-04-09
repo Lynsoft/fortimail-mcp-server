@@ -29,8 +29,5 @@
       ],
       "default": "memory"
     }
-  },
-  "required": [
-    "bearerToken"
-  ]
+  }
 }

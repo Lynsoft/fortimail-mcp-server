@@ -21,7 +21,7 @@ export function registerReportTools(server: McpServer): void {
       title: "List Reports",
       description: "**Purpose:** `GET /v1/reports`.",
       inputSchema: {
-        report_class: reportClassEnum,
+        report_class: reportClassEnum.describe("Report class filter"),
         domain: z.string().optional().describe("Filter by domain mkey when supported by the engine"),
         start_index: z.number().int().min(0).default(0).describe("Pagination offset"),
         page_size: z
@@ -113,7 +113,7 @@ export function registerReportTools(server: McpServer): void {
       description: "**Purpose:** `DELETE /v1/reports` with query params.",
       inputSchema: {
         report_keys: z.string().min(1).describe("Comma-separated report mkeys to delete"),
-        report_class: reportClassEnum,
+        report_class: reportClassEnum.describe("Report class filter"),
         domain: z.string().optional().describe("Filter deletes by domain when supported"),
       },
       annotations: {

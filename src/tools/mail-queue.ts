@@ -56,7 +56,7 @@ export function registerMailQueueTools(server: McpServer): void {
         "**Purpose:** `GET /v1/queue` with `type`, `offset`, `limit`.\n" +
         "**Side effects:** None (read-only).",
       inputSchema: {
-        queue_type: queueTypeEnum,
+        queue_type: queueTypeEnum.describe("Queue type key (maps to engine type integer)"),
         start_index: z.number().int().min(0).default(0).describe("Pagination offset"),
         page_size: z.number().int().min(1).max(200).default(DEFAULT_PAGE_SIZE).describe("Page size"),
       },
@@ -100,7 +100,7 @@ export function registerMailQueueTools(server: McpServer): void {
         "**Purpose:** `GET /v1/queue` with optional `sender`, `recipient`, `clientIp`, `sessionId`, `reason`, `type`.\n" +
         "**Side effects:** None (read-only).",
       inputSchema: {
-        queue_type: queueTypeEnum,
+        queue_type: queueTypeEnum.describe("Queue type key (maps to engine type integer)"),
         relation: z.enum(["and", "or"]).default("and").describe("Ignored by engine; filters are combined per engine rules"),
         client_ip: z.string().optional().describe("Filter by client IP"),
         sender: z.string().optional().describe("Filter by envelope sender"),
@@ -234,7 +234,7 @@ export function registerMailQueueTools(server: McpServer): void {
         "**Side effects:** Destructive.",
       inputSchema: {
         mail_keys: z.string().min(1).describe("Comma-separated mkeys"),
-        queue_type: queueTypeEnum,
+        queue_type: queueTypeEnum.describe("Queue type key (maps to engine type integer)"),
       },
       annotations: {
         readOnlyHint: false,
@@ -271,7 +271,7 @@ export function registerMailQueueTools(server: McpServer): void {
       description: "**Purpose:** `POST /v1/queue/reroute`.",
       inputSchema: {
         mail_keys: z.string().min(1).describe("Comma-separated message mkeys to reroute"),
-        queue_type: queueTypeEnum,
+        queue_type: queueTypeEnum.describe("Queue type key (maps to engine type integer)"),
         alternate_host: z
           .string()
           .min(1)
@@ -316,7 +316,7 @@ export function registerMailQueueTools(server: McpServer): void {
         "**Returns:** Error guidance.",
       inputSchema: {
         mail_keys: z.string().min(1).describe("Comma-separated message mkeys (not implemented in this stub)"),
-        queue_type: queueTypeEnum,
+        queue_type: queueTypeEnum.describe("Queue type key (maps to engine type integer)"),
       },
       annotations: {
         readOnlyHint: true,
