@@ -31,6 +31,13 @@ describe("isMcpHttpAuthorized", () => {
     expect(isMcpHttpAuthorized({})).toBe(false);
   });
 
+  it("accepts mcp_bearer_token query param when Bearer env is set (gateway / Smithery)", () => {
+    process.env.MCP_HTTP_BEARER_TOKEN = "secret";
+    delete process.env.MCP_HTTP_API_KEY;
+    expect(isMcpHttpAuthorized({}, { mcp_bearer_token: "secret" })).toBe(true);
+    expect(isMcpHttpAuthorized({}, { mcp_bearer_token: "wrong" })).toBe(false);
+  });
+
   it("accepts valid X-API-Key when configured", () => {
     delete process.env.MCP_HTTP_BEARER_TOKEN;
     process.env.MCP_HTTP_API_KEY = "key1";

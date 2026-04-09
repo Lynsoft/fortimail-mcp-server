@@ -71,7 +71,7 @@ async function runHTTP(): Promise<void> {
   });
 
   app.post("/mcp", async (req, res) => {
-    if (!isMcpHttpAuthorized(req.headers)) {
+    if (!isMcpHttpAuthorized(req.headers, req.query)) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
