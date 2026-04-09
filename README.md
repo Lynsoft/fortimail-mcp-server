@@ -97,12 +97,33 @@ TRANSPORT=http PORT=3000 MCP_HTTP_BEARER_TOKEN=secret pnpm start
 - **`fortimail.auth.logout`** — no-op (legacy name; engine uses API keys only).
 - **`fortimail.cache.flush`** — clears MCP response cache (not the engine server cache).
 
-## Publishing to MCP directories
+## Publishing to MCP directories (e.g. [Smithery](https://smithery.ai/docs/build/publish))
+
+This server matches Smithery’s **URL** publishing expectations:
+
+| Requirement | How this repo satisfies it |
+|-------------|----------------------------|
+| Streamable HTTP | `POST /mcp` with `@modelcontextprotocol/sdk` `StreamableHTTPServerTransport` |
+| Auth | If you set `MCP_HTTP_BEARER_TOKEN`, clients must send the same secret. Accepted: `Authorization: Bearer …`, header **`X-MCP-Bearer-Token`** (Smithery session `x-from`), or query `?mcp_bearer_token=` |
+| 401 for missing auth | Unauthenticated `POST /mcp` returns **401** with `WWW-Authenticate: Bearer realm="fortimail-mcp"` (not 403) |
+| Config schema | `smithery-config-schema.json` — republish with `--config-schema "$(cat smithery-config-schema.json)"` |
+
+**If Smithery or another gateway shows “couldn’t authenticate with the upstream server”:** the gateway is calling your URL **without** a valid MCP secret. Set **`MCP_HTTP_BEARER_TOKEN`** on the host to match the value users enter in Smithery (or Cursor / ChatGPT connector) for **MCP Bearer Token**. Optional fields in the JSON Schema do **not** remove the need for that token when the server enforces HTTP auth.
+
+**Cloudflare / WAF:** allow `SmitheryBot` and skip JS challenges on `POST /mcp` so scans succeed ([Smithery troubleshooting](https://smithery.ai/docs/build/publish#403-forbidden-during-scan)).
 
 - **Name:** `fortimail-mcp-server`
 - **Description:** MCP client for FortiMail Engine API — domains, users, profiles, queue, reports, logs, SMTP
-- **Required env:** `FORTIMAIL_ENGINE_URL`, `FORTIMAIL_ENGINE_API_KEY`
-- **Transports:** `stdio`, Streamable HTTP (`POST /mcp`)
+- **Required env (process):** `FORTIMAIL_ENGINE_URL`, `FORTIMAIL_ENGINE_API_KEY`
+- **Transports:** `stdio`, Streamable HTTP (`POST /mcp`; `GET /mcp` returns 405 with hint)
+
+### HTTP mode for Cursor / ChatGPT / Claude (remote URL)
+
+Point the client at `https://your-host/mcp` and configure the **same** secret the server expects:
+
+- **Authorization:** `Bearer <MCP_HTTP_BEARER_TOKEN>`, or  
+- **Header:** `X-MCP-Bearer-Token: <MCP_HTTP_BEARER_TOKEN>` (matches Smithery `bearerToken` / `x-mcp-bearer-token`), or  
+- **Query:** `?mcp_bearer_token=<token>` (less ideal; may appear in logs)
 
 ## MSP and multi-instance
 

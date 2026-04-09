@@ -38,6 +38,13 @@ describe("isMcpHttpAuthorized", () => {
     expect(isMcpHttpAuthorized({}, { mcp_bearer_token: "wrong" })).toBe(false);
   });
 
+  it("accepts X-MCP-Bearer-Token header (Smithery session config x-from)", () => {
+    process.env.MCP_HTTP_BEARER_TOKEN = "secret";
+    delete process.env.MCP_HTTP_API_KEY;
+    expect(isMcpHttpAuthorized({ "x-mcp-bearer-token": "secret" })).toBe(true);
+    expect(isMcpHttpAuthorized({ "x-mcp-bearer-token": "wrong" })).toBe(false);
+  });
+
   it("accepts valid X-API-Key when configured", () => {
     delete process.env.MCP_HTTP_BEARER_TOKEN;
     process.env.MCP_HTTP_API_KEY = "key1";

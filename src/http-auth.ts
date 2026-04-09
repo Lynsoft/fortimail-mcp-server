@@ -14,12 +14,24 @@ function firstQueryString(query: QueryLike, name: string): string | undefined {
   return undefined;
 }
 
+function headerString(
+  headers: IncomingHttpHeaders,
+  name: string,
+): string | undefined {
+  const v = headers[name.toLowerCase()];
+  if (typeof v === "string") return v;
+  if (Array.isArray(v) && typeof v[0] === "string") return v[0];
+  return undefined;
+}
+
 /**
  * Returns true if the request is allowed to access /mcp.
  * If neither env var is set, allows all requests (document unsafe for remote use).
  *
- * Bearer auth: `Authorization: Bearer <token>` or query `?mcp_bearer_token=<token>`
- * (query is less ideal — can appear in access logs; prefer headers when the client supports it).
+ * Bearer auth:
+ * - `Authorization: Bearer <token>`
+ * - `X-MCP-Bearer-Token: <token>` (Smithery session config `x-from` / gateway passthrough)
+ * - query `?mcp_bearer_token=<token>` (less ideal — can appear in access logs)
  */
 export function isMcpHttpAuthorized(
   headers: IncomingHttpHeaders,
@@ -32,6 +44,7 @@ export function isMcpHttpAuthorized(
   if (bearer) {
     const auth = headers.authorization;
     if (auth === `Bearer ${bearer}`) return true;
+    if (headerString(headers, "x-mcp-bearer-token") === bearer) return true;
     if (firstQueryString(query, "mcp_bearer_token") === bearer) return true;
   }
   if (apiKey) {

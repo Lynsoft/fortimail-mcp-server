@@ -123,8 +123,24 @@ async function runHTTP(): Promise<void> {
     res.json({ status: "ok", server: "fortimail-mcp-server" });
   });
 
+  // Browsers and health probes often GET /mcp — return 405 + Allow so it is not a silent 404.
+  app.get("/mcp", (_req, res) => {
+    res.status(405).setHeader("Allow", "POST, OPTIONS").json({
+      error: "Method Not Allowed",
+      detail: "MCP Streamable HTTP uses POST /mcp with JSON-RPC.",
+    });
+  });
+
+  app.options("/mcp", (_req, res) => {
+    res.setHeader("Allow", "POST, OPTIONS");
+    res.setHeader("Accept", "application/json");
+    res.status(204).end();
+  });
+
   app.post("/mcp", async (req, res) => {
     if (!isMcpHttpAuthorized(req.headers, req.query)) {
+      // RFC 9728 / MCP: 401 + WWW-Authenticate helps gateways (e.g. Smithery) detect Bearer auth.
+      res.setHeader("WWW-Authenticate", 'Bearer realm="fortimail-mcp"');
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
