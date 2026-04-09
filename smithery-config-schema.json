@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "bearerToken": {
+      "type": "string",
+      "title": "MCP Bearer Token",
+      "description": "Bearer token for authenticating to the FortiMail MCP server (matches MCP_HTTP_BEARER_TOKEN on host).",
+      "x-from": {
+        "header": "x-mcp-bearer-token"
+      },
+      "x-to": {
+        "header": "Authorization",
+        "prefix": "Bearer "
+      }
+    },
+    "verifyCert": {
+      "type": "boolean",
+      "title": "Verify Engine TLS",
+      "description": "Whether the server should verify the FortiMail Engine TLS certificate. Disable for self-signed certs.",
+      "default": true
+    },
+    "cacheBackend": {
+      "type": "string",
+      "title": "Cache Backend",
+      "description": "MCP response cache backend.",
+      "enum": [
+        "memory",
+        "redis"
+      ],
+      "default": "memory"
+    }
+  },
+  "required": [
+    "bearerToken"
+  ]
+}

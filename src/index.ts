@@ -14,6 +14,27 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import express from "express";
+import { z } from "zod";
+
+/**
+ * Smithery session configuration schema.
+ * Exported so `smithery` CLI can extract it automatically.
+ */
+export const configSchema = z.object({
+  bearerToken: z
+    .string()
+    .describe("Bearer token for authenticating to the FortiMail MCP server"),
+  verifyCert: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe("Verify FortiMail Engine TLS certificate (disable for self-signed)"),
+  cacheBackend: z
+    .enum(["memory", "redis"])
+    .optional()
+    .default("memory")
+    .describe("MCP response cache backend"),
+});
 
 import { setCache, MemoryCache, RedisCache } from "./services/cache.js";
 import { isMcpHttpAuthorized } from "./http-auth.js";
