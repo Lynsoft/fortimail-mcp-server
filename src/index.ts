@@ -8,6 +8,8 @@
 
 import "./load-env.js";
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -16,6 +18,7 @@ import express from "express";
 import { setCache, MemoryCache, RedisCache } from "./services/cache.js";
 import { isMcpHttpAuthorized } from "./http-auth.js";
 import { instrumentMcpToolRegistration } from "./instrument-mcp.js";
+import { registerMcpCatalogExtras } from "./mcp-catalog-extras.js";
 
 import { registerAuthTools } from "./tools/auth.js";
 import { registerDomainTools } from "./tools/domains.js";
@@ -41,13 +44,37 @@ async function initCache(): Promise<void> {
   }
 }
 
-function createServer(): McpServer {
-  const server = new McpServer({
+function buildServerInfo() {
+  const title =
+    process.env.MCP_SERVER_TITLE?.trim() || "Lynsoft AI Gateway for FortiMail";
+  const websiteUrl =
+    process.env.MCP_WEBSITE_URL?.trim() ||
+    "https://www.fortinet.com/products/email-security/fortimail";
+  const iconUrl = process.env.MCP_ICON_URL?.trim();
+  return {
     name: "fortimail-mcp-server",
     version: "1.0.0",
-  });
+    title,
+    websiteUrl,
+    ...(iconUrl
+      ? {
+          icons: [
+            {
+              src: iconUrl,
+              mimeType: "image/png",
+              sizes: ["512x512"],
+            },
+          ],
+        }
+      : {}),
+  };
+}
+
+function createServer(): McpServer {
+  const server = new McpServer(buildServerInfo());
 
   instrumentMcpToolRegistration(server);
+  registerMcpCatalogExtras(server);
 
   registerAuthTools(server);
   registerDomainTools(server);
@@ -65,6 +92,10 @@ async function runHTTP(): Promise<void> {
   const server = createServer();
   const app = express();
   app.use(express.json());
+
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const publicDir = path.resolve(__dirname, "..", "public");
+  app.use(express.static(publicDir, { maxAge: "7d" }));
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", server: "fortimail-mcp-server" });
@@ -116,6 +147,9 @@ Environment variables:
   MCP_HTTP_HOST           Bind address for HTTP (default: 0.0.0.0)
   MCP_HTTP_BEARER_TOKEN   If set, require Authorization: Bearer for POST /mcp
   MCP_HTTP_API_KEY        If set, allow X-API-Key for POST /mcp
+  MCP_SERVER_TITLE        MCP display title (default: Lynsoft AI Gateway for FortiMail)
+  MCP_WEBSITE_URL         Homepage URL in MCP metadata (FortiMail product page by default)
+  MCP_ICON_URL            Optional https URL to a PNG icon (512x512) for MCP metadata
 `);
     process.exit(0);
   }

@@ -102,13 +102,19 @@ export function registerMailQueueTools(server: McpServer): void {
       inputSchema: {
         queue_type: queueTypeEnum,
         relation: z.enum(["and", "or"]).default("and").describe("Ignored by engine; filters are combined per engine rules"),
-        client_ip: z.string().optional(),
-        sender: z.string().optional(),
-        recipient: z.string().optional(),
-        session_id: z.string().optional(),
-        reason: z.string().optional(),
-        start_index: z.number().int().min(0).default(0),
-        page_size: z.number().int().min(1).max(200).default(DEFAULT_PAGE_SIZE),
+        client_ip: z.string().optional().describe("Filter by client IP"),
+        sender: z.string().optional().describe("Filter by envelope sender"),
+        recipient: z.string().optional().describe("Filter by envelope recipient"),
+        session_id: z.string().optional().describe("Filter by SMTP/session id when exposed by engine"),
+        reason: z.string().optional().describe("Filter by queue reason text"),
+        start_index: z.number().int().min(0).default(0).describe("Pagination offset"),
+        page_size: z
+          .number()
+          .int()
+          .min(1)
+          .max(200)
+          .default(DEFAULT_PAGE_SIZE)
+          .describe("Page size (max 200)"),
       },
       annotations: {
         readOnlyHint: true,
@@ -159,22 +165,30 @@ export function registerMailQueueTools(server: McpServer): void {
       description: "**Purpose:** `GET /v1/queue/view`.",
       inputSchema: {
         mail_key: z.string().min(1).describe("Message mkey from queue list"),
-        account_type: z.enum([
-          "dead_mail",
-          "deferred_queue",
-          "incoming_queue",
-          "outgoing_queue",
-          "slow_deferred",
-          "slow_incoming",
-          "slow_outgoing",
-          "ibe_queue",
-          "ibe_slow",
-          "fortiguard",
-          "sandbox",
-          "outbreak",
-          "ec_queue",
-        ]),
-        open_method: z.number().int().min(2).max(3).default(3),
+        account_type: z
+          .enum([
+            "dead_mail",
+            "deferred_queue",
+            "incoming_queue",
+            "outgoing_queue",
+            "slow_deferred",
+            "slow_incoming",
+            "slow_outgoing",
+            "ibe_queue",
+            "ibe_slow",
+            "fortiguard",
+            "sandbox",
+            "outbreak",
+            "ec_queue",
+          ])
+          .describe("Queue/account bucket for the message"),
+        open_method: z
+          .number()
+          .int()
+          .min(2)
+          .max(3)
+          .default(3)
+          .describe("Engine open_method (2 or 3 per API)"),
       },
       annotations: {
         readOnlyHint: true,
@@ -256,9 +270,12 @@ export function registerMailQueueTools(server: McpServer): void {
       title: "Send Queued Mail to Alternate Host",
       description: "**Purpose:** `POST /v1/queue/reroute`.",
       inputSchema: {
-        mail_keys: z.string().min(1),
+        mail_keys: z.string().min(1).describe("Comma-separated message mkeys to reroute"),
         queue_type: queueTypeEnum,
-        alternate_host: z.string().min(1),
+        alternate_host: z
+          .string()
+          .min(1)
+          .describe("Target host to receive rerouted mail"),
       },
       annotations: {
         readOnlyHint: false,
@@ -298,7 +315,7 @@ export function registerMailQueueTools(server: McpServer): void {
         "**Purpose:** Not exposed on the FortiMail Engine OpenAPI in this MCP version.\n" +
         "**Returns:** Error guidance.",
       inputSchema: {
-        mail_keys: z.string().min(1),
+        mail_keys: z.string().min(1).describe("Comma-separated message mkeys (not implemented in this stub)"),
         queue_type: queueTypeEnum,
       },
       annotations: {

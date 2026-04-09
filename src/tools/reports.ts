@@ -22,9 +22,15 @@ export function registerReportTools(server: McpServer): void {
       description: "**Purpose:** `GET /v1/reports`.",
       inputSchema: {
         report_class: reportClassEnum,
-        domain: z.string().optional(),
-        start_index: z.number().int().min(0).default(0),
-        page_size: z.number().int().min(1).max(200).default(DEFAULT_PAGE_SIZE),
+        domain: z.string().optional().describe("Filter by domain mkey when supported by the engine"),
+        start_index: z.number().int().min(0).default(0).describe("Pagination offset"),
+        page_size: z
+          .number()
+          .int()
+          .min(1)
+          .max(200)
+          .default(DEFAULT_PAGE_SIZE)
+          .describe("Page size (max 200)"),
       },
       annotations: {
         readOnlyHint: true,
@@ -69,9 +75,11 @@ export function registerReportTools(server: McpServer): void {
       title: "Download Report",
       description: "**Purpose:** `POST /v1/reports/download` (binary payload decoded as UTF-8 text when possible).",
       inputSchema: {
-        report_key: z.string().min(1),
-        report_class: z.enum(["domain_mailstats", "mailbox_stats", "mail_stats"]),
-        domain: z.string().optional(),
+        report_key: z.string().min(1).describe("Report mkey from list reports"),
+        report_class: z
+          .enum(["domain_mailstats", "mailbox_stats", "mail_stats"])
+          .describe("Report class for download"),
+        domain: z.string().optional().describe("Domain mkey when required by report type"),
       },
       annotations: {
         readOnlyHint: true,
@@ -104,9 +112,9 @@ export function registerReportTools(server: McpServer): void {
       title: "Delete Reports",
       description: "**Purpose:** `DELETE /v1/reports` with query params.",
       inputSchema: {
-        report_keys: z.string().min(1),
+        report_keys: z.string().min(1).describe("Comma-separated report mkeys to delete"),
         report_class: reportClassEnum,
-        domain: z.string().optional(),
+        domain: z.string().optional().describe("Filter deletes by domain when supported"),
       },
       annotations: {
         readOnlyHint: false,
@@ -200,7 +208,10 @@ export function registerReportTools(server: McpServer): void {
       title: "Generate Mailbox Statistics Report",
       description: "**Purpose:** `POST /v1/reports/mailbox`.",
       inputSchema: {
-        task_name: z.string().min(1),
+        task_name: z
+          .string()
+          .min(1)
+          .describe("Scheduled task mmkey for mailbox statistics (e.g. from engine UI)"),
       },
       annotations: {
         readOnlyHint: false,

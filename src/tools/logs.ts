@@ -17,8 +17,14 @@ export function registerLogTools(server: McpServer): void {
       description: "**Purpose:** `GET /v1/logs?type=&limit=&offset=`.",
       inputSchema: {
         log_type: z.enum(LOG_TYPES).describe("Log type"),
-        start_index: z.number().int().min(0).default(0),
-        page_size: z.number().int().min(1).max(200).default(DEFAULT_PAGE_SIZE),
+        start_index: z.number().int().min(0).default(0).describe("Pagination offset"),
+        page_size: z
+          .number()
+          .int()
+          .min(1)
+          .max(200)
+          .default(DEFAULT_PAGE_SIZE)
+          .describe("Page size (max 200)"),
       },
       annotations: {
         readOnlyHint: true,
@@ -60,7 +66,10 @@ export function registerLogTools(server: McpServer): void {
         "**Purpose:** `POST /v1/logs/download`. Response bytes are interpreted as UTF-8 text (use `compressed: false` for plain text in MCP).",
       inputSchema: {
         log_file: z.string().min(1).describe("Log file mkey from list"),
-        compressed: z.boolean().default(false),
+        compressed: z
+          .boolean()
+          .default(false)
+          .describe("If true, request compressed payload from engine (when supported)"),
       },
       annotations: {
         readOnlyHint: true,

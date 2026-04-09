@@ -57,6 +57,7 @@ RUN pnpm install --prod --frozen-lockfile \
     && chown -R nonroot:nonroot /app
 
 COPY --from=builder --chown=nonroot:nonroot /app/dist ./dist
+COPY --chown=nonroot:nonroot public ./public
 
 USER nonroot
 
