@@ -39,7 +39,10 @@ export const configSchema = z.object({
 });
 
 import { setCache, MemoryCache, RedisCache } from "./services/cache.js";
-import { isMcpHttpAuthorized } from "./http-auth.js";
+import {
+  isMcpHttpAuthorized,
+  mcpAuthDebugPresence,
+} from "./http-auth.js";
 import { instrumentMcpToolRegistration } from "./instrument-mcp.js";
 import { registerMcpCatalogExtras } from "./mcp-catalog-extras.js";
 
@@ -124,11 +127,23 @@ async function runHTTP(): Promise<void> {
     res.json({ status: "ok", server: "fortimail-mcp-server" });
   });
 
-  // Browsers and health probes often GET /mcp — return 405 + Allow so it is not a silent 404.
-  app.get("/mcp", (_req, res) => {
+  // Gateways may GET /mcp first. If auth is required, return 401 (not 405) so clients discover Bearer.
+  app.get("/mcp", (req, res) => {
+    if (!isMcpHttpAuthorized(req.headers, req.query)) {
+      if (process.env.MCP_HTTP_DEBUG_AUTH === "true") {
+        console.error(
+          "[fortimail-mcp] GET /mcp auth failed",
+          mcpAuthDebugPresence(req.headers, req.query),
+        );
+      }
+      res.setHeader("WWW-Authenticate", 'Bearer realm="fortimail-mcp"');
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
     res.status(405).setHeader("Allow", "POST, OPTIONS").json({
       error: "Method Not Allowed",
-      detail: "MCP Streamable HTTP uses POST /mcp with JSON-RPC.",
+      detail:
+        "MCP Streamable HTTP: use POST /mcp with JSON-RPC. Successful POST responses stream as SSE (text/event-stream).",
     });
   });
 
@@ -139,15 +154,23 @@ async function runHTTP(): Promise<void> {
   });
 
   app.post("/mcp", async (req, res) => {
+    // Enforce MCP secret at the edge; clients send Bearer on initialize (Smithery / ChatGPT).
     if (!isMcpHttpAuthorized(req.headers, req.query)) {
+      if (process.env.MCP_HTTP_DEBUG_AUTH === "true") {
+        console.error(
+          "[fortimail-mcp] POST /mcp auth failed",
+          mcpAuthDebugPresence(req.headers, req.query),
+        );
+      }
       // RFC 9728 / MCP: 401 + WWW-Authenticate helps gateways (e.g. Smithery) detect Bearer auth.
       res.setHeader("WWW-Authenticate", 'Bearer realm="fortimail-mcp"');
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
+    // Default: SSE streaming per MCP Streamable HTTP (omit enableJsonResponse).
+    // enableJsonResponse: true forces a single application/json body and breaks clients that expect SSE.
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
-      enableJsonResponse: true,
     });
     res.on("close", () => transport.close());
     await server.connect(transport);
@@ -189,6 +212,7 @@ Environment variables:
   MCP_SERVER_TITLE        MCP display title (default: Lynsoft AI Gateway for FortiMail)
   MCP_WEBSITE_URL         Homepage URL in MCP metadata (FortiMail product page by default)
   MCP_ICON_URL            Optional https URL to a PNG icon (512x512) for MCP metadata
+  MCP_HTTP_DEBUG_AUTH     If "true", log which credential headers were present on 401 (no secrets)
 `);
     process.exit(0);
   }

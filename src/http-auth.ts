@@ -37,14 +37,46 @@ function headerString(
   return undefined;
 }
 
-/** Value after `Bearer` (case-insensitive), trimmed — matches gateways that add extra spaces. */
+/**
+ * Credential from `Authorization` header: `Bearer <token>` (flexible) or raw `<token>`
+ * (some gateways send the secret without the Bearer scheme).
+ */
 export function bearerCredentialFromAuthorization(
   authorization: string | undefined,
 ): string | undefined {
   if (typeof authorization !== "string") return undefined;
-  const m = /^Bearer\s+([\s\S]+)$/i.exec(authorization.trim());
-  if (!m) return undefined;
-  return m[1].trim();
+  const t = authorization.trim();
+  const m = /^Bearer\s+([\s\S]+)$/i.exec(t);
+  if (m) return m[1].trim();
+  if (t.length > 0) return t;
+  return undefined;
+}
+
+/** Primary `Authorization` value, or `X-Forwarded-Authorization` when a proxy preserved it separately. */
+function primaryAuthorizationHeader(
+  headers: IncomingHttpHeaders,
+): string | undefined {
+  const a = headers.authorization;
+  if (typeof a === "string") return a;
+  if (Array.isArray(a) && typeof a[0] === "string") return a[0];
+  return headerString(headers, "x-forwarded-authorization");
+}
+
+/** Safe booleans for logs when auth fails (no secrets). */
+export function mcpAuthDebugPresence(
+  headers: IncomingHttpHeaders,
+  query?: QueryLike,
+): Record<string, boolean | string[]> {
+  return {
+    hasAuthorization: !!primaryAuthorizationHeader(headers),
+    hasXForwardedAuthorization: !!headerString(
+      headers,
+      "x-forwarded-authorization",
+    ),
+    hasXMcpBearerToken: !!headerString(headers, "x-mcp-bearer-token"),
+    queryKeys:
+      query && typeof query === "object" ? Object.keys(query) : [],
+  };
 }
 
 /**
@@ -66,11 +98,7 @@ export function isMcpHttpAuthorized(
 
   if (bearer) {
     const fromAuth = bearerCredentialFromAuthorization(
-      typeof headers.authorization === "string"
-        ? headers.authorization
-        : Array.isArray(headers.authorization)
-          ? headers.authorization[0]
-          : undefined,
+      primaryAuthorizationHeader(headers),
     );
     if (fromAuth === bearer) return true;
 

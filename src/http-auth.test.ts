@@ -62,6 +62,23 @@ describe("isMcpHttpAuthorized", () => {
     expect(isMcpHttpAuthorized({ "x-mcp-bearer-token": "wrong" })).toBe(false);
   });
 
+  it("accepts raw Authorization value without Bearer prefix (some gateways)", () => {
+    process.env.MCP_HTTP_BEARER_TOKEN = "tok_abc";
+    delete process.env.MCP_HTTP_API_KEY;
+    expect(isMcpHttpAuthorized({ authorization: "tok_abc" })).toBe(true);
+    expect(isMcpHttpAuthorized({ authorization: "Bearer tok_abc" })).toBe(true);
+  });
+
+  it("accepts X-Forwarded-Authorization when proxy preserved Bearer separately", () => {
+    process.env.MCP_HTTP_BEARER_TOKEN = "secret";
+    delete process.env.MCP_HTTP_API_KEY;
+    expect(
+      isMcpHttpAuthorized({
+        "x-forwarded-authorization": "Bearer secret",
+      }),
+    ).toBe(true);
+  });
+
   it("accepts valid X-API-Key when configured", () => {
     delete process.env.MCP_HTTP_BEARER_TOKEN;
     process.env.MCP_HTTP_API_KEY = "key1";
