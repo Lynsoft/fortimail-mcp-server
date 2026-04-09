@@ -103,19 +103,24 @@ This server matches Smithery’s **URL** publishing expectations:
 
 | Requirement | How this repo satisfies it |
 |-------------|----------------------------|
-| Streamable HTTP | `POST /mcp` with `@modelcontextprotocol/sdk` `StreamableHTTPServerTransport` |
+| Streamable HTTP | `POST /mcp` with `@modelcontextprotocol/sdk` `StreamableHTTPServerTransport` (SSE `text/event-stream` responses — not single JSON) |
 | Auth | If you set `MCP_HTTP_BEARER_TOKEN`, clients must send the same secret. Accepted: `Authorization: Bearer …`, header **`X-MCP-Bearer-Token`** (Smithery session `x-from`), or query `?mcp_bearer_token=` |
 | 401 for missing auth | Unauthenticated `POST /mcp` returns **401** with `WWW-Authenticate: Bearer realm="fortimail-mcp"` (not 403) |
 | Config schema | `smithery-config-schema.json` — republish with `--config-schema "$(cat smithery-config-schema.json)"` |
 
 **If Smithery or another gateway shows “couldn’t authenticate with the upstream server”:** the gateway is calling your URL **without** a valid MCP secret. Set **`MCP_HTTP_BEARER_TOKEN`** on the host to match the value users enter in Smithery (or Cursor / ChatGPT connector) for **MCP Bearer Token**. Optional fields in the JSON Schema do **not** remove the need for that token when the server enforces HTTP auth.
 
-**Cloudflare / WAF:** allow `SmitheryBot` and skip JS challenges on `POST /mcp` so scans succeed ([Smithery troubleshooting](https://smithery.ai/docs/build/publish#403-forbidden-during-scan)).
+**Cloudflare / WAF:** allow `SmitheryBot` and skip JS challenges on `POST /mcp` so scans succeed ([Smithery troubleshooting](https://smithery.ai/docs/build/publish#403-forbidden-during-scan)). For MCP, also **disable caching and response buffering** on `/mcp` so **SSE streams** are not broken.
+
+
+**Reverse proxy (Traefik / nginx / Dokploy):** The upstream **must** receive the same credential headers the client sends. If `Authorization` is stripped, configure the proxy to forward it, or have the gateway send **`X-MCP-Bearer-Token`** (supported by this server). Some setups copy the client `Authorization` into **`X-Forwarded-Authorization`** — that is supported when the primary `Authorization` header is missing.
+
+**Still failing:** Set `MCP_HTTP_DEBUG_AUTH=true` on the container and retry from ChatGPT; check logs for `hasAuthorization` / `hasXMcpBearerToken` / `queryKeys` (no secrets logged). If all are `false`, the gateway is not forwarding credentials to your origin.
 
 - **Name:** `fortimail-mcp-server`
 - **Description:** MCP client for FortiMail Engine API — domains, users, profiles, queue, reports, logs, SMTP
 - **Required env (process):** `FORTIMAIL_ENGINE_URL`, `FORTIMAIL_ENGINE_API_KEY`
-- **Transports:** `stdio`, Streamable HTTP (`POST /mcp`; `GET /mcp` returns 405 with hint)
+- **Transports:** `stdio`, Streamable HTTP (`POST /mcp` streams SSE; `GET /mcp` returns 401 without auth, else 405 with hint)
 
 ### HTTP mode for Cursor / ChatGPT / Claude (remote URL)
 
